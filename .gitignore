@@ -29,3 +29,5 @@ jacoco.exec
 **/original-pom.xml
 original-pom.xml
 **/logback-test.xml
+**/.gradle
+**/build
