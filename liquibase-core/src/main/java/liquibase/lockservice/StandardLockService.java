@@ -28,6 +28,8 @@ import liquibase.structure.DatabaseObject;
 import liquibase.structure.core.Table;
 
 import java.text.DateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.*;
 
 import static java.util.ResourceBundle.getBundle;
@@ -391,13 +393,13 @@ public class StandardLockService implements LockService {
                     locked = (Boolean) lockedValue;
                 }
                 if ((locked != null) && locked) {
-                    allLocks.add(
-                            new DatabaseChangeLogLock(
-                                    ((Number) columnMap.get("ID")).intValue(),
-                                    (Date) columnMap.get("LOCKGRANTED"),
-                                    (String) columnMap.get("LOCKEDBY")
-                            )
-                    );
+                    try {
+                        allLocks.add(new DatabaseChangeLogLock(((Number) columnMap.get("ID")).intValue(), (Date) columnMap.get("LOCKGRANTED"), (String) columnMap.get("LOCKEDBY")));
+                    } catch (java.lang.ClassCastException e) {
+                        Instant instant = ((java.time.LocalDateTime) columnMap.get("LOCKGRANTED")).toInstant(ZoneOffset.UTC);
+                        Date date = Date.from(instant);
+                        allLocks.add(new DatabaseChangeLogLock(((Number) columnMap.get("ID")).intValue(), date, (String) columnMap.get("LOCKEDBY")));
+                    }
                 }
             }
             return allLocks.toArray(new DatabaseChangeLogLock[allLocks.size()]);

@@ -320,15 +320,19 @@ public class StandardChangeLogHistoryService extends AbstractChangeLogHistorySer
                     String comments = (rs.get("COMMENTS") == null) ? null : rs.get("COMMENTS").toString();
                     Object tmpDateExecuted = rs.get("DATEEXECUTED");
                     Date dateExecuted = null;
-                    if (tmpDateExecuted instanceof Date) {
-                        dateExecuted = (Date) tmpDateExecuted;
-                    } else {
-                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        try {
-                            dateExecuted = df.parse((String) tmpDateExecuted);
-                        } catch (ParseException e) {
-                            // Ignore ParseException and assume dateExecuted == null instead of aborting.
+                    try {
+                        if (tmpDateExecuted instanceof Date) {
+                            dateExecuted = (Date) tmpDateExecuted;
+                        } else {
+                            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            try {
+                                dateExecuted = df.parse((String) tmpDateExecuted);
+                            } catch (ParseException e) {
+                                // Ignore ParseException and assume dateExecuted == null instead of aborting.
+                            }
                         }
+                    } catch(ClassCastException e) {
+
                     }
                     String tmpOrderExecuted = rs.get("ORDEREXECUTED").toString();
                     Integer orderExecuted = ((tmpOrderExecuted == null) ? null : Integer.valueOf(tmpOrderExecuted));
